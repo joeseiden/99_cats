@@ -1,6 +1,3 @@
-# require 'bcrypt'
-
-
 class User < ActiveRecord::Base
 
   validates :user_name, :session_token, presence: true, uniqueness: true
