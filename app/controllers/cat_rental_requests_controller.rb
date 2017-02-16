@@ -1,4 +1,7 @@
 class CatRentalRequestsController < ApplicationController
+
+  before_action :verify_owner, only: [:approve, :deny]
+
   def approve
     current_cat_rental_request.approve!
     redirect_to cat_url(current_cat)
@@ -34,7 +37,17 @@ class CatRentalRequestsController < ApplicationController
   end
 
   def cat_rental_request_params
-    params.require(:cat_rental_request)
+    cat_rental_request_params = params.require(:cat_rental_request)
       .permit(:cat_id, :end_date, :start_date, :status)
+    cat_rental_request_params[:user_id] = current_user.id
+    cat_rental_request_params
+  end
+
+  def verify_owner
+    unless current_cat.owner.id == current_user.id
+      current_user.errors[:not] << "your cat!"
+      flash[:errors] = current_user.errors.full_messages
+      redirect_to cat_url(current_cat)
+    end
   end
 end
